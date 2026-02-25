@@ -1,0 +1,158 @@
+/* ═══════════════════════════════════════════════════════════════
+   LPU Auto-Connect — Dark Mode for internet.lpu.in
+   Injected by content.js when darkMode setting is enabled.
+   ═══════════════════════════════════════════════════════════════ */
+
+html,
+body {
+    background: #0f0f1a !important;
+    color: #e0e0e8 !important;
+}
+
+/* Main containers */
+body>*,
+.container,
+.wrapper,
+.main,
+.content,
+form,
+.form-group,
+.panel,
+.panel-body,
+div[class*="container"],
+div[class*="wrapper"],
+div[class*="content"],
+div[class*="panel"],
+div[class*="box"],
+div[class*="card"],
+table,
+tr,
+td,
+th {
+    background-color: #1a1a2e !important;
+    color: #e0e0e8 !important;
+    border-color: #2a2a4a !important;
+}
+
+/* Inputs & Selects */
+input,
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"] {
+    background: #12121f !important;
+    color: #e0e0e8 !important;
+    border: 1px solid #3a3a5a !important;
+    border-radius: 6px !important;
+}
+
+input::placeholder {
+    color: #666680 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    outline: none !important;
+}
+
+/* Buttons */
+button,
+input[type="submit"],
+input[type="button"],
+.btn,
+a.btn,
+[class*="btn"] {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+button:hover,
+input[type="submit"]:hover,
+.btn:hover,
+a.btn:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-1px) !important;
+}
+
+button:disabled,
+input[type="submit"]:disabled {
+    background: #2a2a4a !important;
+    color: #555 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Links */
+a {
+    color: #818cf8 !important;
+}
+
+a:hover {
+    color: #a5b4fc !important;
+}
+
+/* Labels */
+label,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.label,
+.text,
+.title,
+.heading {
+    color: #e0e0e8 !important;
+}
+
+/* Images — slightly dim to reduce glare */
+img {
+    opacity: 0.85 !important;
+    filter: brightness(0.9) !important;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+    accent-color: #6366f1 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #12121f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3a3a5a;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4a4a6a;
+}
+
+/* Remove bright backgrounds and shadows */
+* {
+    text-shadow: none !important;
+}
+
+/* Iframes if any */
+iframe {
+    filter: invert(0.9) hue-rotate(180deg) !important;
+}
