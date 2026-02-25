@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPU Auto-Connect</title>
+    <link rel="stylesheet" href="popup.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M1 9L3.54 11.11C5.67 8.17 8.62 6 12 6C15.38 6 18.33 8.17 20.46 11.11L23 9C20.32 5.36 16.42 3 12 3C7.58 3 3.68 5.36 1 9Z"
+                            fill="url(#wifi-grad)" />
+                        <path
+                            d="M5 13L7.54 15.11C8.67 13.44 10.22 12.25 12 12.25C13.78 12.25 15.33 13.44 16.46 15.11L19 13C17.33 10.61 14.83 9 12 9C9.17 9 6.67 10.61 5 13Z"
+                            fill="url(#wifi-grad)" opacity="0.85" />
+                        <path d="M9 17L12 21L15 17C14.2 16.07 13.16 15.5 12 15.5C10.84 15.5 9.8 16.07 9 17Z"
+                            fill="url(#wifi-grad)" opacity="0.7" />
+                        <defs>
+                            <linearGradient id="wifi-grad" x1="1" y1="3" x2="23" y2="21" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366f1" />
+                                <stop offset="1" stop-color="#a855f7" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="header-title">LPU Auto-Connect</h1>
+                    <p class="header-subtitle" id="statusSubtitle">Checking network...</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="conn-status-mini" id="connStatusMini">
+                    <span class="conn-dot" id="connDot"></span>
+                    <span id="connLabel">—</span>
+                </span>
+                <span class="badge" id="networkBadge" title="Network Type">—</span>
+                <div class="status-dot" id="statusDot" title="Connection Status"></div>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tabs">
+            <button class="tab active" data-tab="dashboard">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                Dashboard
+            </button>
+            <button class="tab" data-tab="dns">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                VPN
+            </button>
+            <button class="tab" data-tab="settings">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                </svg>
+                Settings
+            </button>
+        </nav>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="tab-dashboard">
+            <!-- Data Usage + Network Health Row -->
+            <div class="stats-row stats-row-2">
+                <div class="card stat-card">
+                    <span class="stat-icon">📊</span>
+                    <span class="stat-value" id="dataUsedValue">0 MB</span>
+                    <span class="stat-label">Today's Usage</span>
+                </div>
+                <div class="card stat-card" id="healthStatCard">
+                    <span class="stat-icon" id="healthEmoji">📶</span>
+                    <span class="stat-value" id="healthRTT">— ms</span>
+                    <span class="stat-label" id="healthLabel">Checking...</span>
+                </div>
+            </div>
+
+
+
+            <!-- Speed Test Card -->
+            <div class="card speed-card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <span class="card-title">Speed Test</span>
+                </div>
+                <div class="speed-display">
+                    <div class="speed-value-container">
+                        <span class="speed-value" id="speedValue">—</span>
+                        <span class="speed-unit">Mbps</span>
+                    </div>
+                    <div class="speed-meta">
+                        <div class="speed-meta-item">
+                            <span class="meta-label">Latency</span>
+                            <span class="meta-value" id="latencyValue">—</span>
+                        </div>
+                        <div class="speed-meta-item">
+                            <span class="meta-label">Type</span>
+                            <span class="meta-value" id="connectionType">—</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary speed-btn" id="runSpeedTest">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    Run Speed Test
+                </button>
+                <div class="progress-bar" id="speedProgress">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="card stat-card">
+                    <span class="stat-icon">🕐</span>
+                    <span class="stat-value" id="sessionTime">0m</span>
+                    <span class="stat-label">Session</span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-icon">🔄</span>
+                    <span class="stat-value" id="loginCount">0</span>
+                    <span class="stat-label">Logins</span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-icon">📶</span>
+                    <span class="stat-value" id="downlinkValue">—</span>
+                    <span class="stat-label">Downlink</span>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card quicklinks-card">
+                <div class="card-header">
+                    <span class="card-icon">🔗</span>
+                    <span class="card-title">Quick Links</span>
+                </div>
+                <div class="quicklinks-grid">
+                    <button class="quicklink" data-url="https://ums.lpu.in/lpuums/" data-name="UMS">
+                        <span class="ql-icon">🎓</span>
+                        <span class="ql-name">UMS</span>
+                    </button>
+                    <button class="quicklink" data-url="https://myclass.lpu.in/" data-name="MyClass">
+                        <span class="ql-icon">📚</span>
+                        <span class="ql-name">MyClass</span>
+                    </button>
+                    <button class="quicklink" data-url="https://lpulive.lpu.in/" data-name="LPULive">
+                        <span class="ql-icon">📺</span>
+                        <span class="ql-name">LPULive</span>
+                    </button>
+                    <button class="quicklink" data-url="https://oas.lpu.in/" data-name="OAS">
+                        <span class="ql-icon">📝</span>
+                        <span class="ql-name">OAS</span>
+                    </button>
+                    <button class="quicklink" data-url="https://lpucolab438.examly.io/" data-name="NeoBrowser">
+                        <span class="ql-icon">💻</span>
+                        <span class="ql-name">Neo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VPN/DNS Tab -->
+        <div class="tab-content" id="tab-dns">
+            <!-- VPN Proxy Card -->
+            <div class="card vpn-card">
+                <div class="card-header">
+                    <span class="card-icon">🔒</span>
+                    <span class="card-title">VPN Proxy</span>
+                </div>
+                <p class="dns-description">
+                    Route traffic through a proxy to bypass blocked sites. internet.lpu.in is always bypassed.
+                </p>
+                <div class="vpn-status-row">
+                    <div class="vpn-status">
+                        <div class="vpn-dot" id="vpnDot"></div>
+                        <span class="vpn-label" id="vpnLabel">Proxy Off</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleVPN">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="vpn-config" id="vpnConfig">
+                    <div class="form-group">
+                        <label class="form-label" for="proxyHost">Proxy Host</label>
+                        <input type="text" class="form-input" id="proxyHost" placeholder="e.g. proxy.example.com">
+                    </div>
+                    <div class="vpn-row">
+                        <div class="form-group" style="flex:1">
+                            <label class="form-label" for="proxyPort">Port</label>
+                            <input type="number" class="form-input" id="proxyPort" placeholder="8080">
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label class="form-label" for="proxyScheme">Scheme</label>
+                            <select class="form-input" id="proxyScheme">
+                                <option value="http">HTTP</option>
+                                <option value="https">HTTPS</option>
+                                <option value="socks5">SOCKS5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary vpn-save-btn" id="saveProxy">Save Proxy Config</button>
+                </div>
+            </div>
+
+            <!-- DNS Section -->
+            <div class="card dns-providers-card">
+                <div class="card-header">
+                    <span class="card-icon">🛡️</span>
+                    <span class="card-title">Secure DNS</span>
+                    <span class="dns-current-value" id="currentDNS" style="margin-left:auto;font-size:11px">System
+                        Default</span>
+                </div>
+                <div class="dns-option active" data-dns="default">
+                    <div class="dns-radio">
+                        <div class="dns-radio-inner"></div>
+                    </div>
+                    <div class="dns-option-info">
+                        <span class="dns-option-name">System Default</span>
+                    </div>
+                </div>
+                <div class="dns-option" data-dns="cloudflare">
+                    <div class="dns-radio">
+                        <div class="dns-radio-inner"></div>
+                    </div>
+                    <div class="dns-option-info">
+                        <span class="dns-option-name">Cloudflare</span>
+                        <span class="dns-option-desc">1.1.1.1</span>
+                    </div>
+                    <span class="dns-badge fast">Fast</span>
+                </div>
+                <div class="dns-option" data-dns="google">
+                    <div class="dns-radio">
+                        <div class="dns-radio-inner"></div>
+                    </div>
+                    <div class="dns-option-info">
+                        <span class="dns-option-name">Google DNS</span>
+                        <span class="dns-option-desc">8.8.8.8</span>
+                    </div>
+                </div>
+                <div class="dns-option" data-dns="quad9">
+                    <div class="dns-radio">
+                        <div class="dns-radio-inner"></div>
+                    </div>
+                    <div class="dns-option-info">
+                        <span class="dns-option-name">Quad9</span>
+                        <span class="dns-option-desc">9.9.9.9</span>
+                    </div>
+                    <span class="dns-badge secure">Secure</span>
+                </div>
+                <div class="dns-option" data-dns="adguard">
+                    <div class="dns-radio">
+                        <div class="dns-radio-inner"></div>
+                    </div>
+                    <div class="dns-option-info">
+                        <span class="dns-option-name">AdGuard</span>
+                        <span class="dns-option-desc">94.140.14.14</span>
+                    </div>
+                    <span class="dns-badge adblock">Ads</span>
+                </div>
+                <button class="btn btn-primary dns-apply-btn" id="applyDNS" style="margin-top:10px">Apply DNS</button>
+            </div>
+
+            <button class="btn btn-secondary" id="openChromeSecureDNS" style="margin-bottom:10px">
+                Open Chrome DNS Settings ↗
+            </button>
+
+            <div class="save-toast" id="dnsToast">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span id="dnsToastMsg">Done!</span>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="tab-settings">
+            <!-- WiFi Accounts (for internet.lpu.in) -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span class="card-icon">📶</span>
+                    <span class="card-title">WiFi Accounts</span>
+                    <button class="btn-icon" id="addAccountBtn" title="Add Account">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="accounts-list" id="accountsList">
+                    <!-- Populated by JS -->
+                </div>
+                <!-- Add Account Form (hidden by default) -->
+                <div class="add-account-form" id="addAccountForm" style="display:none">
+                    <div class="form-group">
+                        <label class="form-label">Account Name</label>
+                        <input type="text" class="form-input" id="newAccountName" placeholder="e.g. Main, Friend">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Registration Number</label>
+                        <input type="text" class="form-input" id="newAccountUser" placeholder="12345678">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="newAccountPass" placeholder="Password">
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="saveNewAccount" style="flex:1">Save Account</button>
+                        <button class="btn btn-secondary" id="cancelNewAccount" style="flex:1">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <!-- UMS / Portal Credentials (separate from WiFi) -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span class="card-icon">🎓</span>
+                    <span class="card-title">UMS / Portal Credentials</span>
+                </div>
+                <p class="settings-note">Used for UMS, MyClass, LPULive, OAS</p>
+                <div class="form-group">
+                    <label class="form-label" for="umsUsername">Registration Number</label>
+                    <input type="text" class="form-input" id="umsUsername" placeholder="12345678">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="umsPassword">Password</label>
+                    <input type="password" class="form-input" id="umsPassword" placeholder="Portal password">
+                </div>
+                <button class="btn btn-primary" id="saveUmsCredentials" style="margin-top:4px">Save Portal
+                    Credentials</button>
+            </div>
+
+            <!-- NeoBrowser Credentials -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span class="card-icon">�</span>
+                    <span class="card-title">NeoBrowser Credentials</span>
+                </div>
+                <p class="settings-note">Default: your_regno@neocolab.ai / your_regno</p>
+                <div class="form-group">
+                    <label class="form-label" for="neoUsername">Username</label>
+                    <input type="text" class="form-input" id="neoUsername" placeholder="12345678@neocolab.ai">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="neoPassword">Password</label>
+                    <input type="password" class="form-input" id="neoPassword" placeholder="Registration number">
+                </div>
+                <button class="btn btn-primary" id="saveNeoCredentials" style="margin-top:4px">Save Neo
+                    Credentials</button>
+            </div>
+
+            <!-- Preferences -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span class="card-icon">⚙️</span>
+                    <span class="card-title">Preferences</span>
+                </div>
+                <div class="toggle-row">
+                    <div>
+                        <span class="toggle-label">Auto-Login</span>
+                        <span class="toggle-desc">Automatically submit login form</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleAutoLogin" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div>
+                        <span class="toggle-label">Auto-Close Tab</span>
+                        <span class="toggle-desc">Close login tab after success</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleAutoClose" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div>
+                        <span class="toggle-label">Session Keep-Alive</span>
+                        <span class="toggle-desc">Ping portal every 15min to prevent timeout</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleKeepAlive" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div>
+                        <span class="toggle-label">Dark Mode (Portal)</span>
+                        <span class="toggle-desc">Make internet.lpu.in dark themed</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleDarkMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="save-toast" id="saveToast">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span id="saveToastMsg">Saved!</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span>LPU Auto-Connect v2.0</span>
+            <span>•</span>
+            <span>Made by netxspider</span>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
