@@ -1,0 +1,82 @@
+{
+    "manifest_version": 3,
+    "name": "LPU Auto-Connect",
+    "version": "2.0.0",
+    "description": "Student productivity hub for LPU WiFi: auto-login, speed test, VPN proxy, keep-alive, data usage, quick links & multi-account.",
+    "permissions": [
+        "storage",
+        "activeTab",
+        "tabs",
+        "proxy",
+        "alarms",
+        "webRequest"
+    ],
+    "host_permissions": [
+        "*://internet.lpu.in/*",
+        "*://ums.lpu.in/*",
+        "*://myclass.lpu.in/*",
+        "*://lpulive.lpu.in/*",
+        "*://oas.lpu.in/*",
+        "*://*.examly.io/*",
+        "<all_urls>"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://internet.lpu.in/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "*://ums.lpu.in/*"
+            ],
+            "js": [
+                "tesseract.min.js",
+                "autofill.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "*://myclass.lpu.in/*",
+                "*://lpulive.lpu.in/*",
+                "*://oas.lpu.in/*",
+                "*://*.examly.io/*"
+            ],
+            "js": [
+                "autofill.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "darkmode.css"
+            ],
+            "matches": [
+                "*://internet.lpu.in/*"
+            ]
+        }
+    ]
+}
