@@ -1,95 +1,138 @@
-# 🛜 LPU Auto-Connect
+# LPU Auto-Connect v2.0
 
-A Chrome extension that **automatically logs you into the LPU WiFi captive portal** (`internet.lpu.in`) — no more typing credentials and checking that terms box every single time.
+A Chrome extension and student productivity hub for LPU WiFi — auto-login to the captive portal, one-click access to student portals with credential auto-fill, session keep-alive, data usage tracking, network health monitoring, and more.
 
-## ✨ Features
+## Features
 
+### WiFi Auto-Login
 | Feature | Description |
 |---------|-------------|
-| **Auto-Login** | Fills username, password, and checks T&C automatically |
-| **Speed Test** | One-click download speed measurement |
-| **Connection Info** | Network type, downlink speed display |
-| **Session Timer** | Track how long you've been connected |
-| **Login Counter** | See how many times you've auto-logged in |
-| **Auto-Close** | Optionally closes the login tab after success |
-| **Secure Storage** | Credentials stored locally — never synced to cloud |
+| **Auto-Login** | Fills username, password, checks T&C, and submits on `internet.lpu.in` |
+| **Multi-Account** | Save and switch between multiple WiFi accounts |
+| **Auto-Close Tab** | Closes the login tab after successful authentication |
+| **Session Keep-Alive** | Pings the portal every 15 minutes to prevent session timeout |
+| **Dark Mode (Portal)** | Injects a dark theme into the captive portal page |
 
-## 🚀 Installation
+### Dashboard
+| Feature | Description |
+|---------|-------------|
+| **Data Usage Tracker** | Monitors daily network traffic via `chrome.webRequest` |
+| **Network Health Score** | RTT-based health rating (Gaming Ready / Low Latency / YouTube OK / Slow / WiFi Dying) |
+| **Speed Test** | One-click download speed and latency measurement |
+| **Session Timer** | Tracks how long you've been connected |
+| **Login Counter** | Tracks total auto-login count |
 
-1. Open Chrome and go to `chrome://extensions/`
-2. Turn on **Developer mode** (toggle in top-right)
-3. Click **"Load unpacked"**
+### Quick Links with Auto-Fill
+One-click access to student portals — credentials are auto-filled on page load.
+
+| Portal | Auto-Fill | Auto-Submit |
+|--------|-----------|-------------|
+| **UMS** (`ums.lpu.in`) | Username → reload → Password + Captcha OCR | No (reCAPTCHA) |
+| **MyClass** (`myclass.lpu.in`) | Username + Password | Yes |
+| **LPULive** (`lpulive.lpu.in`) | Username + Password | No (Cloudflare) |
+| **OAS** (`oas.lpu.in`) | Username + Password | Yes |
+| **NeoBrowser** (`examly.io`) | Email → Next → Password (two-step) | Yes |
+
+> **UMS Captcha:** Uses Tesseract.js OCR to automatically read and fill the captcha. The recognized text can be corrected before submitting.
+
+### Credential Management
+| Section | Used For |
+|---------|----------|
+| **WiFi Accounts** | `internet.lpu.in` captive portal login |
+| **UMS / Portal Credentials** | UMS, MyClass, LPULive, OAS |
+| **NeoBrowser Credentials** | `examly.io` (defaults to `<regno>@neocolab.ai` / `<regno>`) |
+
+### VPN & DNS
+| Feature | Description |
+|---------|-------------|
+| **Proxy Toggle** | Route traffic through a custom HTTP/HTTPS/SOCKS proxy |
+| **Secure DNS** | Switch between Cloudflare, Google, Quad9, AdGuard, or system default DoH |
+
+## Installation
+
+1. Open Chrome → `chrome://extensions/`
+2. Turn on **Developer mode** (top-right toggle)
+3. Click **Load unpacked**
 4. Select the `LPUInternetExtension` folder
-5. The extension icon will appear in your toolbar! 🎉
+5. Click the extension icon in your toolbar
 
-## ⚙️ Setup
+## Setup
 
-1. Click the extension icon in your toolbar
-2. Go to the **Settings** tab
-3. Enter your **Registration Number** and **Password**
-4. Toggle your preferences (Auto-Login, Auto-Close Tab)
-5. Click **Save Settings**
+1. Click the extension icon
+2. Go to **Settings** tab
+3. Add a **WiFi Account** (Registration Number + Password for `internet.lpu.in`)
+4. Add **UMS / Portal Credentials** (for UMS, MyClass, LPULive, OAS)
+5. Optionally set **NeoBrowser Credentials**
+6. Toggle preferences: Auto-Login, Auto-Close, Keep-Alive, Dark Mode
 
-That's it! Next time you connect to LPU WiFi and the captive portal opens, the extension will handle everything automatically.
-
-## 🏗️ How It Works
+## How It Works
 
 ```
-You connect to LPU WiFi
+Connect to LPU WiFi
         ↓
-Browser opens internet.lpu.in (captive portal)
+Browser opens internet.lpu.in
         ↓
-Content script detects the login form
+content.js detects login form → auto-fills → submits
         ↓
-Auto-fills credentials from local storage
+You're online! (tab auto-closes if enabled)
         ↓
-Checks terms & conditions checkbox
+background.js pings portal every 15min (keep-alive)
         ↓
-Clicks "Login" button
+Click Quick Link (e.g. UMS) → autofill.js fills credentials
         ↓
-You're online! ✅ (tab auto-closes if enabled)
+Tesseract.js reads captcha → fills it → you verify and login
 ```
 
-## 📁 File Structure
+## File Structure
 
 ```
 LPUInternetExtension/
-├── manifest.json      → Extension config (Manifest V3)
-├── content.js         → Auto-login script (runs on internet.lpu.in)
-├── background.js      → Service worker (session tracking, speed test)
-├── popup.html         → Dashboard UI
-├── popup.css          → Premium dark theme styles
-├── popup.js           → Dashboard logic
+├── manifest.json        → Extension config (MV3), permissions, content scripts
+├── background.js        → Service worker: keep-alive, data tracking, speed test, proxy
+├── content.js           → Auto-login on internet.lpu.in + dark mode injection
+├── autofill.js          → Auto-fill credentials on UMS, MyClass, LPULive, OAS, NeoBrowser
+├── tesseract.min.js     → Tesseract.js OCR library for UMS captcha solving
+├── darkmode.css         → Dark theme stylesheet for captive portal
+├── popup.html           → Extension popup UI (3 tabs: Dashboard, VPN, Settings)
+├── popup.css            → Dark glassmorphism theme styles
+├── popup.js             → Popup logic: data usage, health, accounts, quick links
 ├── icons/
-│   ├── icon16.png     → Toolbar icon
-│   ├── icon48.png     → Extensions page icon
-│   └── icon128.png    → Chrome Web Store icon
-└── README.md          → This file
+│   ├── icon16.png
+│   ├── icon48.png
+│   └── icon128.png
+└── README.md
 ```
 
-## 🔒 Security
+## Permissions
 
-- Credentials are stored using `chrome.storage.local` (never synced)
-- No data is sent to any external server
-- The extension only activates on `internet.lpu.in` pages
-- Open source — you can inspect every line of code
+| Permission | Reason |
+|------------|--------|
+| `storage` | Save credentials and settings locally |
+| `tabs` | Open quick links and manage login tabs |
+| `proxy` | VPN/proxy routing |
+| `alarms` | Schedule keep-alive pings every 15 minutes |
+| `webRequest` | Track network traffic for data usage estimation |
+| `<all_urls>` | Monitor data usage across all sites |
 
-## 🐛 Troubleshooting
+## Security
+
+- All credentials are stored locally via `chrome.storage.local` — never synced or transmitted
+- No data is sent to external servers
+- Content scripts only activate on specific LPU domains
+- Open source — inspect every line of code
+
+## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Extension doesn't auto-login | Check that credentials are saved in Settings tab |
-| Login form not detected | The portal may have changed — open an issue |
-| Infinite login loop | The extension has built-in loop prevention, but if it happens, disable Auto-Login temporarily |
-| Speed test fails | You may not be connected to the internet yet |
-
-## 🤝 Notes
-
-- If the captive portal page structure changes, the content script selectors may need updating
-- The speed test uses a small public file download — results are approximate
-- `navigator.connection` API may not be available in all browsers (connection type/downlink)
+| Extension doesn't auto-login | Verify credentials in Settings → WiFi Accounts |
+| Quick links don't auto-fill | Save credentials in UMS / Portal Credentials section |
+| UMS captcha not solved | OCR may misread — correct the text and submit manually |
+| Auto-Login toggle is ON but still not submitting | Reload extension at `chrome://extensions/` |
+| NeoBrowser login fails | Check two-step flow — email must be entered first, then password |
+| Speed test fails | Ensure you're connected to the internet first |
+| Infinite login loop | Disable Auto-Login temporarily in Settings |
 
 ---
 
-Made with ❤️ at LPU
-# LPUInternetExtension
+**LPU Auto-Connect v2.0** — Made by [netxspider](https://github.com/netxspider)
