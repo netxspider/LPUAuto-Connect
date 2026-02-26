@@ -171,7 +171,7 @@
         connectionType.textContent = effectiveType;
 
         if (rtt === null || rtt === undefined) {
-            healthEmoji.textContent = '❓';
+            healthEmoji.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>';
             healthRTT.textContent = '— ms';
             healthLabel.textContent = 'RTT unavailable';
             return;
@@ -179,11 +179,11 @@
 
         healthRTT.textContent = rtt + ' ms';
 
-        if (rtt < 50) { healthEmoji.textContent = '🚀'; healthLabel.textContent = 'Gaming Ready'; }
-        else if (rtt < 100) { healthEmoji.textContent = '✅'; healthLabel.textContent = 'Low Latency'; }
-        else if (rtt <= 300) { healthEmoji.textContent = '📺'; healthLabel.textContent = 'YouTube OK'; }
-        else if (rtt <= 500) { healthEmoji.textContent = '🐌'; healthLabel.textContent = 'Slow'; }
-        else { healthEmoji.textContent = '💀'; healthLabel.textContent = 'WiFi dying'; }
+        if (rtt < 50) { healthEmoji.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><path d="M6 12L3.27 3.13A1 1 0 0 1 4.38 2l16.24 8.11a1 1 0 0 1 0 1.78L4.38 20a1 1 0 0 1-1.11-1.13L6 12z"/></svg>'; healthLabel.textContent = 'Gaming Ready'; }
+        else if (rtt < 100) { healthEmoji.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'; healthLabel.textContent = 'Low Latency'; }
+        else if (rtt <= 300) { healthEmoji.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>'; healthLabel.textContent = 'YouTube OK'; }
+        else if (rtt <= 500) { healthEmoji.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>'; healthLabel.textContent = 'Slow'; }
+        else { healthEmoji.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'; healthLabel.textContent = 'WiFi dying'; }
     }
 
     // ─── Quick Links ─────────────────────────────────────────────────
