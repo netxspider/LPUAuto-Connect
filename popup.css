@@ -1072,6 +1072,66 @@ select.form-input {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ─── Header Toggle ───────────────────────────────────────── */
+.header-toggle {
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Extension Disabled State ────────────────────────────── */
+.app.disabled .tab-content {
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+.app.disabled .tabs {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.app.disabled .header-left {
+  opacity: 0.5;
+}
+
+/* ─── Donate Card ─────────────────────────────────────────── */
+.donate-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(251, 191, 36, 0.04));
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.donate-card:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.06));
+}
+
+.donate-icon {
+  color: #fbbf24;
+}
+
+.donate-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.donate-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
+}
+
+.donate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+}
+
+.donate-btn:active {
+  transform: translateY(0);
+}
+
 /* ─── Footer ──────────────────────────────────────────────── */
 .footer {
   display: flex;

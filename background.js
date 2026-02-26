@@ -114,8 +114,8 @@ function setupKeepAlive(enabled) {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === 'keepAlive') {
-        chrome.storage.local.get(['keepAlive'], (data) => {
-            if (data.keepAlive === false) return;
+        chrome.storage.local.get(['keepAlive', 'extensionEnabled'], (data) => {
+            if (data.keepAlive === false || data.extensionEnabled === false) return;
 
             // Silently ping the portal to keep session alive
             fetch('http://internet.lpu.in', {

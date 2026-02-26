@@ -313,16 +313,24 @@
 
     // ─── Wait for Page & Run ───────────────────────────────────────────
     function init() {
-        const checkInterval = setInterval(() => {
-            const usernameField = findUsernameField();
-            if (usernameField || document.readyState === 'complete') {
-                clearInterval(checkInterval);
-                setTimeout(attemptLogin, 1000); // give portal JS time to initialize
+        // Check if extension is enabled before proceeding
+        chrome.storage.local.get(['extensionEnabled'], (data) => {
+            if (data.extensionEnabled === false) {
+                console.log('[LPU Auto-Connect] Extension is disabled. Skipping auto-login.');
+                return;
             }
-        }, 300);
 
-        // Failsafe: stop checking after 15 seconds
-        setTimeout(() => clearInterval(checkInterval), 15000);
+            const checkInterval = setInterval(() => {
+                const usernameField = findUsernameField();
+                if (usernameField || document.readyState === 'complete') {
+                    clearInterval(checkInterval);
+                    setTimeout(attemptLogin, 1000); // give portal JS time to initialize
+                }
+            }, 300);
+
+            // Failsafe: stop checking after 15 seconds
+            setTimeout(() => clearInterval(checkInterval), 15000);
+        });
     }
 
     if (document.readyState === 'loading') {

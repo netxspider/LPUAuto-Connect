@@ -406,7 +406,13 @@
     // ════════════════════════════════════════════════════════════════
 
     function startAutoFill() {
-        chrome.storage.local.get(['autoLogin'], (settings) => {
+        chrome.storage.local.get(['autoLogin', 'extensionEnabled'], (settings) => {
+            // Check if extension is enabled (default: true)
+            if (settings.extensionEnabled === false) {
+                console.log('[LPU] Extension is disabled. Skipping auto-fill.');
+                return;
+            }
+
             // Default to true if not set
             const autoLogin = settings.autoLogin !== false;
 

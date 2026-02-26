@@ -10,11 +10,9 @@
     const $$ = (sel) => document.querySelectorAll(sel);
 
     // ─── DOM References ──────────────────────────────────────────────
-    const statusDot = $('#statusDot');
     const statusSubtitle = $('#statusSubtitle');
-    const networkBadge = $('#networkBadge');
-    const connDot = $('#connDot');
-    const connLabel = $('#connLabel');
+    const extensionToggle = $('#extensionToggle');
+    const donateBtn = $('#donateBtn');
 
     const tabs = $$('.tab');
     const tabContents = $$('.tab-content');
@@ -116,31 +114,15 @@
     }
 
     function updateNetworkUI(info) {
-        statusDot.className = 'status-dot';
-        connDot.className = 'conn-dot';
         const { online, status, networkType, authorized } = info;
 
-        // Network badge
-        if (networkType === 'lpu_wifi') { networkBadge.textContent = 'LPU WiFi'; networkBadge.className = 'badge lpu'; }
-        else if (networkType === 'cellular') { networkBadge.textContent = 'Mobile'; networkBadge.className = 'badge other'; }
-        else if (online) { networkBadge.textContent = 'WiFi'; networkBadge.className = 'badge other'; }
-        else { networkBadge.textContent = 'Offline'; networkBadge.className = 'badge'; }
-
-        // Connection status in header
         if (!online) {
-            connDot.classList.add('disconnected'); connLabel.textContent = 'Offline';
-            statusDot.classList.add('disconnected');
             statusSubtitle.textContent = 'No connection';
         } else if (status === 'authorized' || authorized) {
-            connDot.classList.add('connected'); connLabel.textContent = 'Connected';
-            statusDot.classList.add('connected');
             statusSubtitle.textContent = 'Connected & authorized';
         } else if (status === 'unauthorized') {
-            connDot.classList.add('unauthorized'); connLabel.textContent = 'Login needed';
-            statusDot.classList.add('unauthorized');
             statusSubtitle.textContent = 'Login required';
         } else {
-            connLabel.textContent = 'Checking...';
             statusSubtitle.textContent = 'Verifying...';
         }
     }
@@ -238,8 +220,13 @@
         chrome.storage.local.get([
             'autoLogin', 'autoClose', 'keepAlive', 'darkMode',
             'dnsProvider', 'proxyHost', 'proxyPort', 'proxyScheme', 'vpnEnabled',
-            'neoUsername', 'neoPassword', 'umsUsername', 'umsPassword', 'lastSpeedMbps'
+            'neoUsername', 'neoPassword', 'umsUsername', 'umsPassword', 'lastSpeedMbps',
+            'extensionEnabled'
         ], (data) => {
+            // Extension toggle (default: enabled)
+            const isEnabled = data.extensionEnabled !== false;
+            extensionToggle.checked = isEnabled;
+            document.querySelector('.app').classList.toggle('disabled', !isEnabled);
             toggleAutoLogin.checked = data.autoLogin !== false;
             toggleAutoClose.checked = data.autoClose !== false;
             toggleKeepAlive.checked = data.keepAlive !== false;
@@ -278,6 +265,20 @@
     autoSaveToggle(toggleAutoClose, 'autoClose', 'Auto-Close');
     autoSaveToggle(toggleKeepAlive, 'keepAlive', 'Keep-Alive');
     autoSaveToggle(toggleDarkMode, 'darkMode', 'Portal Dark Mode');
+
+    // ─── Extension Enable/Disable Toggle ─────────────────────────────
+    extensionToggle.addEventListener('change', () => {
+        const enabled = extensionToggle.checked;
+        chrome.storage.local.set({ extensionEnabled: enabled }, () => {
+            document.querySelector('.app').classList.toggle('disabled', !enabled);
+            showToast(saveToast, saveToastMsg, `Extension ${enabled ? 'enabled' : 'disabled'}`);
+        });
+    });
+
+    // ─── Buy Me a Coffee ─────────────────────────────────────────────
+    donateBtn.addEventListener('click', () => {
+        chrome.tabs.create({ url: 'https://razorpay.me/@netxspider' });
+    });
 
     // ─── Multi-Account System ────────────────────────────────────────
     function loadAccounts() {
@@ -531,11 +532,6 @@
         chrome.storage.local.get(['connectionStatus', 'sessionStart', 'loginCount'], (data) => {
             loginCountEl.textContent = data.loginCount || 0;
             if (data.sessionStart) updateSessionTime(data.sessionStart);
-            if (data.connectionStatus === 'connected') {
-                statusDot.classList.add('connected');
-                connDot.classList.add('connected');
-                connLabel.textContent = 'Connected';
-            }
         });
     }
 
@@ -562,13 +558,13 @@
     // ─── Real-time Updates ───────────────────────────────────────────
     chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'local') return;
-        if (changes.connectionStatus && changes.connectionStatus.newValue === 'connected') {
-            connDot.className = 'conn-dot connected';
-            connLabel.textContent = 'Connected';
-            statusDot.className = 'status-dot connected';
-        }
         if (changes.loginCount) loginCountEl.textContent = changes.loginCount.newValue || 0;
         if (changes.sessionStart) updateSessionTime(changes.sessionStart.newValue);
+        if (changes.extensionEnabled) {
+            const enabled = changes.extensionEnabled.newValue !== false;
+            extensionToggle.checked = enabled;
+            document.querySelector('.app').classList.toggle('disabled', !enabled);
+        }
     });
 
     // ─── Initialize ──────────────────────────────────────────────────
