@@ -1,14 +1,15 @@
 {
     "manifest_version": 3,
     "name": "LPU Auto-Connect",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "description": "Student productivity hub for LPU WiFi: auto-login, speed test, VPN proxy, keep-alive, quick links & multi-account.",
     "permissions": [
         "storage",
         "activeTab",
         "tabs",
         "proxy",
-        "alarms"
+        "alarms",
+        "webRequest"
     ],
     "host_permissions": [
         "*://internet.lpu.in/*",
@@ -16,7 +17,8 @@
         "*://myclass.lpu.in/*",
         "*://lpulive.lpu.in/*",
         "*://oas.lpu.in/*",
-        "*://*.examly.io/*"
+        "*://*.examly.io/*",
+        "<all_urls>"
     ],
     "action": {
         "default_popup": "popup.html",
