@@ -31,8 +31,7 @@
     const isOAS = host.includes('oas.lpu.in');
     const isNeoBrowser = host.includes('examly.io') || host.includes('lpucolab');
 
-    // LPULive always blocked (Cloudflare), UMS has its own logic
-    const neverAutoSubmit = isLPULive;
+    // UMS has its own two-step logic; all other portals can auto-submit
 
     // ════════════════════════════════════════════════════════════════
     // Helpers
@@ -150,8 +149,7 @@
                     setFieldValue(userField, username);
                 }
 
-                // Attempt captcha OCR
-                solveCaptchaOCR(autoLogin);
+                console.log('[LPU] UMS password filled — fill captcha manually then click Login.');
                 return;
             }
 
@@ -184,31 +182,41 @@
             return;
         }
 
-        // Find the captcha image — try common selectors
-        const captchaImg = findInput([
-            'img#imgCaptcha',
-            'img#captchaImage',
-            'img#CaptchaImage',
-            'img.captcha',
-            'img[alt*="captcha"]',
-            'img[alt*="Captcha"]',
-            'img[src*="captcha"]',
-            'img[src*="Captcha"]',
-        ]) || document.querySelector('img[id*="aptcha"]') || document.querySelector('img[src*="aptcha"]');
+        // Find the captcha image — BotDetect (UMS uses BDC_CaptchaImage class)
+        const captchaImg =
+            document.querySelector('img.BDC_CaptchaImage') ||
+            document.querySelector('img[id*="CaptchaImage"]') ||
+            findInput([
+                'img#imgCaptcha',
+                'img#captchaImage',
+                'img.captcha',
+                'img[alt*="captcha"]',
+                'img[alt*="Captcha"]',
+                'img[src*="captcha"]',
+                'img[src*="Captcha"]',
+                'img[src*="BotDetect"]',
+            ]) ||
+            document.querySelector('img[id*="aptcha"]') ||
+            document.querySelector('img[src*="aptcha"]');
 
-        // Find the captcha input field
-        const captchaInput = findInput([
-            'input#txtCaptcha',
-            'input#captcha',
-            'input#Captcha',
-            'input[name="captcha"]',
-            'input[name="Captcha"]',
-            'input[name="txtCaptcha"]',
-            'input[placeholder*="captcha"]',
-            'input[placeholder*="Captcha"]',
-            'input[placeholder*="code"]',
-            'input[placeholder*="Code"]',
-        ]);
+        // Find the captcha input field — BotDetect uses BDC_ prefixed IDs
+        const captchaInput =
+            document.querySelector('input[id*="CaptchaCode"]') ||
+            document.querySelector('input[id*="CaptchaText"]') ||
+            document.querySelector('input[name*="CaptchaCode"]') ||
+            findInput([
+                'input#txtCaptcha',
+                'input#captcha',
+                'input#Captcha',
+                'input[name="captcha"]',
+                'input[name="Captcha"]',
+                'input[name="txtCaptcha"]',
+                'input[placeholder*="captcha"]',
+                'input[placeholder*="Captcha"]',
+                'input[placeholder*="CAPTCHA"]',
+                'input[placeholder*="code"]',
+                'input[placeholder*="Code"]',
+            ]);
 
         if (!captchaImg || !captchaInput) {
             console.log('[LPU] Captcha image or input not found.',
@@ -219,38 +227,79 @@
         console.log('[LPU] Captcha image found, running Tesseract.js OCR...');
 
         try {
-            // Convert captcha image to canvas for better OCR
+            // ── Fetch the captcha image as a blob (avoids CORS rejection) ──
+            // BotDetect rejects crossOrigin="anonymous" requests. Using fetch
+            // with credentials sends session cookies without an Origin header.
+            // IMPORTANT: use the src exactly as-is — the &t= param is BotDetect's
+            // session token and must NOT be modified (changing it causes 400).
+            const captchaSrc = captchaImg.src;
+            let blobUrl = null;
+            try {
+                const resp = await fetch(captchaSrc, {
+                    credentials: 'include',
+                    cache: 'no-store'
+                });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const blob = await resp.blob();
+                blobUrl = URL.createObjectURL(blob);
+                console.log('[LPU] Captcha image fetched as blob OK.');
+            } catch (fetchErr) {
+                console.warn('[LPU] Blob fetch failed, falling back to src:', fetchErr.message);
+            }
+
+            // ── Load image ──
+            const rawImg = new Image();
+            await new Promise((resolve, reject) => {
+                rawImg.onload = resolve;
+                rawImg.onerror = (e) => {
+                    console.error('[LPU] Image load error:', e);
+                    reject(new Error('Image load failed'));
+                };
+                rawImg.src = blobUrl || captchaSrc;
+            });
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
+
+            const srcW = rawImg.naturalWidth || rawImg.width || 200;
+            const srcH = rawImg.naturalHeight || rawImg.height || 60;
+            console.log('[LPU] Captcha natural size:', srcW, 'x', srcH);
+
+            // ── Scale up 3× for better OCR resolution ──
+            const SCALE = 3;
             const canvas = document.createElement('canvas');
+            canvas.width = srcW * SCALE;
+            canvas.height = srcH * SCALE;
             const ctx = canvas.getContext('2d');
 
-            // Create a new image to ensure it's loaded
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
+            // White background first
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            await new Promise((resolve, reject) => {
-                img.onload = resolve;
-                img.onerror = reject;
-                // Use the captcha image source
-                img.src = captchaImg.src;
-            });
+            // Draw image scaled up (no smoothing = sharper edges for OCR)
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(rawImg, 0, 0, canvas.width, canvas.height);
 
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-
-            // Pre-process: increase contrast (grayscale + threshold)
+            // ── Grayscale → Threshold → Invert ──
+            // BotDetect captcha = dark/coloured background + white/light text.
+            // After grayscale: background pixels are dark (<128), text pixels are bright (>128).
+            // After threshold (>128 → 255): background = 0 (black), text = 255 (white).
+            // Tesseract expects DARK text on LIGHT background → we must INVERT.
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                // Convert to grayscale
-                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                // Apply threshold for cleaner OCR
-                const val = gray > 128 ? 255 : 0;
-                data[i] = data[i + 1] = data[i + 2] = val;
+            const px = imageData.data;
+            for (let i = 0; i < px.length; i += 4) {
+                const gray = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+                // Threshold then invert: bright pixels (text) → 0 (black), dark bg → 255 (white)
+                const val = gray > 128 ? 0 : 255;
+                px[i] = px[i + 1] = px[i + 2] = val;
+                px[i + 3] = 255; // full opacity
             }
             ctx.putImageData(imageData, 0, 0);
 
-            // Run Tesseract OCR
+            const processedDataUrl = canvas.toDataURL('image/png');
+
+            // ── OCR: try multiple PSM modes until we get text ──
+            const psmModes = ['8', '7', '6', '13']; // single-word, single-line, block, raw-line
+            let captchaText = '';
+
             const worker = await Tesseract.createWorker('eng', 1, {
                 logger: m => {
                     if (m.status === 'recognizing text') {
@@ -259,24 +308,25 @@
                 }
             });
 
-            // Set OCR parameters for better captcha recognition
-            await worker.setParameters({
-                tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-                tessedit_pageseg_mode: '7', // Treat as single line of text
-            });
+            for (const psm of psmModes) {
+                await worker.setParameters({
+                    // UMS captcha is uppercase letters + digits
+                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+                    tessedit_pageseg_mode: psm,
+                });
+                const { data: { text } } = await worker.recognize(processedDataUrl);
+                captchaText = text.replace(/[\s\n\r]/g, '').trim();
+                console.log(`[LPU] OCR PSM ${psm} result: "${captchaText}"`);
+                if (captchaText.length >= 4) break; // decent result
+            }
 
-            const { data: { text } } = await worker.recognize(canvas.toDataURL());
             await worker.terminate();
-
-            // Clean the recognized text (remove spaces, newlines)
-            const captchaText = text.replace(/[\s\n\r]/g, '').trim();
 
             if (captchaText) {
                 captchaInput.focus();
                 setFieldValue(captchaInput, captchaText);
-                console.log('[LPU] Captcha solved:', captchaText);
+                console.log('[LPU] Captcha filled:', captchaText);
 
-                // Auto-submit if autoLogin is enabled
                 if (autoLogin) {
                     setTimeout(() => {
                         const btn = findSubmitButton();
@@ -284,12 +334,12 @@
                             console.log('[LPU] Auto-submitting UMS login.');
                             btn.click();
                         }
-                    }, 500);
+                    }, 800);
                 } else {
                     console.log('[LPU] Auto-Login OFF — captcha filled, user submits manually.');
                 }
             } else {
-                console.log('[LPU] OCR returned empty text.');
+                console.log('[LPU] OCR returned empty text — user must fill captcha manually.');
             }
         } catch (err) {
             console.error('[LPU] Captcha OCR error:', err);
@@ -327,11 +377,11 @@
                     console.log('[LPU] Portal password filled.');
                 }
 
-                // Auto-submit only if autoLogin is ON and site allows it
-                if (autoLogin && !neverAutoSubmit) {
+                // Auto-submit if autoLogin is ON
+                if (autoLogin) {
                     setTimeout(() => clickSubmit(userField || pf), 500);
                 } else {
-                    console.log('[LPU] Auto-Login OFF or CAPTCHA site — user submits manually.');
+                    console.log('[LPU] Auto-Login OFF — user submits manually.');
                 }
             }, 400);
         });
