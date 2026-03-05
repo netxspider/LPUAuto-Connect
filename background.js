@@ -85,10 +85,11 @@ chrome.runtime.onInstalled.addListener(() => {
         }
     });
     // Set default settings
-    chrome.storage.local.get(['keepAlive', 'darkMode'], (data) => {
+    chrome.storage.local.get(['keepAlive', 'darkMode', 'dataCapMB'], (data) => {
         const defaults = {};
         if (data.keepAlive === undefined) defaults.keepAlive = true;
         if (data.darkMode === undefined) defaults.darkMode = false;
+        if (data.dataCapMB === undefined) defaults.dataCapMB = 2048; // 2GB default
         if (Object.keys(defaults).length > 0) {
             chrome.storage.local.set(defaults);
         }
@@ -134,6 +135,52 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.keepAlive) {
         setupKeepAlive(changes.keepAlive.newValue);
+    }
+});
+
+// ─── Data Usage Tracking ─────────────────────────────────────────────
+// Uses chrome.webRequest.onCompleted to estimate data consumption.
+// Tracks Content-Length from response headers, keyed by date for daily totals.
+
+function getTodayKey() {
+    const now = new Date();
+    return `dataUsage_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+chrome.webRequest.onCompleted.addListener(
+    (details) => {
+        let contentLength = 0;
+        if (details.responseHeaders) {
+            for (const header of details.responseHeaders) {
+                if (header.name.toLowerCase() === 'content-length') {
+                    contentLength = parseInt(header.value) || 0;
+                    break;
+                }
+            }
+        }
+        if (contentLength === 0) contentLength = 5120; // ~5KB fallback
+        const totalEstimate = contentLength + 500; // + request headers estimate
+        const key = getTodayKey();
+        chrome.storage.local.get([key], (data) => {
+            const current = data[key] || 0;
+            chrome.storage.local.set({ [key]: current + totalEstimate });
+        });
+    },
+    { urls: ['<all_urls>'] },
+    ['responseHeaders']
+);
+
+// Message handler for getting data usage
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'GET_DATA_USAGE') {
+        const key = getTodayKey();
+        chrome.storage.local.get([key, 'dataCapMB'], (data) => {
+            sendResponse({
+                bytesUsed: data[key] || 0,
+                dataCapMB: data.dataCapMB || 2048
+            });
+        });
+        return true;
     }
 });
 
