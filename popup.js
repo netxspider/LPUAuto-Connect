@@ -12,16 +12,17 @@
     // ─── DOM References ──────────────────────────────────────────────
     const statusSubtitle = $('#statusSubtitle');
     const extensionToggle = $('#extensionToggle');
+    const themeToggle = $('#themeToggle');
     const donateBtn = $('#donateBtn');
+    const clearUmsBtn = $('#clearUmsCredentials');
+    const clearNeoBtn = $('#clearNeoCredentials');
+    const appEl = document.querySelector('.app');
 
     const tabs = $$('.tab');
     const tabContents = $$('.tab-content');
 
     // Dashboard
-    const dataUsedValue = $('#dataUsedValue');
-    const healthEmoji = $('#healthEmoji');
-    const healthRTT = $('#healthRTT');
-    const healthLabel = $('#healthLabel');
+    const dataUsedValue = null; // removed
     const speedValue = $('#speedValue');
     const latencyValue = $('#latencyValue');
     const connectionType = $('#connectionType');
@@ -221,12 +222,17 @@
             'autoLogin', 'autoClose', 'keepAlive', 'darkMode',
             'dnsProvider', 'proxyHost', 'proxyPort', 'proxyScheme', 'vpnEnabled',
             'neoUsername', 'neoPassword', 'umsUsername', 'umsPassword', 'lastSpeedMbps',
-            'extensionEnabled'
+            'extensionEnabled', 'uiTheme'
         ], (data) => {
             // Extension toggle (default: enabled)
             const isEnabled = data.extensionEnabled !== false;
             extensionToggle.checked = isEnabled;
-            document.querySelector('.app').classList.toggle('disabled', !isEnabled);
+            appEl.classList.toggle('disabled', !isEnabled);
+
+            // Theme (default: dark)
+            const isLight = data.uiTheme === 'light';
+            appEl.classList.toggle('light-theme', isLight);
+
             toggleAutoLogin.checked = data.autoLogin !== false;
             toggleAutoClose.checked = data.autoClose !== false;
             toggleKeepAlive.checked = data.keepAlive !== false;
@@ -270,8 +276,32 @@
     extensionToggle.addEventListener('change', () => {
         const enabled = extensionToggle.checked;
         chrome.storage.local.set({ extensionEnabled: enabled }, () => {
-            document.querySelector('.app').classList.toggle('disabled', !enabled);
+            appEl.classList.toggle('disabled', !enabled);
             showToast(saveToast, saveToastMsg, `Extension ${enabled ? 'enabled' : 'disabled'}`);
+        });
+    });
+
+    // ─── Sun/Moon Theme Toggle ────────────────────────────────────────
+    themeToggle.addEventListener('click', () => {
+        const isLight = appEl.classList.toggle('light-theme');
+        chrome.storage.local.set({ uiTheme: isLight ? 'light' : 'dark' });
+        showToast(saveToast, saveToastMsg, isLight ? 'Light theme' : 'Dark theme');
+    });
+
+    // ─── Clear Credential Buttons ─────────────────────────────────────
+    clearUmsBtn.addEventListener('click', () => {
+        chrome.storage.local.remove(['umsUsername', 'umsPassword'], () => {
+            umsUsername.value = '';
+            umsPassword.value = '';
+            showToast(saveToast, saveToastMsg, 'Portal credentials cleared');
+        });
+    });
+
+    clearNeoBtn.addEventListener('click', () => {
+        chrome.storage.local.remove(['neoUsername', 'neoPassword'], () => {
+            neoUsername.value = '';
+            neoPassword.value = '';
+            showToast(saveToast, saveToastMsg, 'NeoBrowser credentials cleared');
         });
     });
 
@@ -563,7 +593,7 @@
         if (changes.extensionEnabled) {
             const enabled = changes.extensionEnabled.newValue !== false;
             extensionToggle.checked = enabled;
-            document.querySelector('.app').classList.toggle('disabled', !enabled);
+            appEl.classList.toggle('disabled', !enabled);
         }
     });
 
@@ -572,12 +602,9 @@
     loadStoredStatus();
     loadAccounts();
     checkNetwork();
-    updateDataUsage();
-    updateNetworkHealth();
 
     // Periodic updates
     setInterval(checkNetwork, 30000);
-    setInterval(updateDataUsage, 15000);
     setInterval(() => {
         chrome.storage.local.get(['sessionStart'], (data) => {
             if (data.sessionStart) updateSessionTime(data.sessionStart);
