@@ -6,7 +6,7 @@
 html,
 body {
     background: #0f0f1a !important;
-    color: #e0e0e8 !important;
+    color: #000000 !important;
 }
 
 /* Main containers */
@@ -30,7 +30,7 @@ tr,
 td,
 th {
     background-color: #1a1a2e !important;
-    color: #e0e0e8 !important;
+    color: #000000 !important;
     border-color: #2a2a4a !important;
 }
 
@@ -43,13 +43,13 @@ input[type="password"],
 input[type="email"],
 input[type="number"] {
     background: #12121f !important;
-    color: #e0e0e8 !important;
+    color: #000000 !important;
     border: 1px solid #3a3a5a !important;
     border-radius: 6px !important;
 }
 
 input::placeholder {
-    color: #666680 !important;
+    color: #555577 !important;
 }
 
 input:focus,
@@ -94,14 +94,14 @@ input[type="submit"]:disabled {
 
 /* Links */
 a {
-    color: #818cf8 !important;
+    color: #4f46e5 !important;
 }
 
 a:hover {
-    color: #a5b4fc !important;
+    color: #6366f1 !important;
 }
 
-/* Labels */
+/* Labels and all text elements */
 label,
 span,
 p,
@@ -114,8 +114,12 @@ h6,
 .label,
 .text,
 .title,
-.heading {
-    color: #e0e0e8 !important;
+.heading,
+div,
+li,
+td,
+th {
+    color: #000000 !important;
 }
 
 /* Images — slightly dim to reduce glare */
@@ -147,7 +151,7 @@ input[type="checkbox"] {
     background: #4a4a6a;
 }
 
-/* Remove bright backgrounds and shadows */
+/* Remove text shadows */
 * {
     text-shadow: none !important;
 }

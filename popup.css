@@ -1072,10 +1072,53 @@ select.form-input {
   transform: translateX(-50%) translateY(0);
 }
 
-/* ─── Header Toggle ───────────────────────────────────────── */
-.header-toggle {
+/* ─── Header Controls (theme + extension toggle) ─────────── */
+.header-controls {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+/* Sun/Moon theme toggle button */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: rgba(99, 102, 241, 0.35);
+  transform: scale(1.05);
+}
+
+/* Default (dark mode): show sun, hide moon */
+.theme-toggle .icon-sun {
+  display: block;
+}
+
+.theme-toggle .icon-moon {
+  display: none;
+}
+
+/* Light mode: show moon, hide sun */
+.app.light-theme .theme-toggle .icon-sun {
+  display: none;
+}
+
+.app.light-theme .theme-toggle .icon-moon {
+  display: block;
 }
 
 /* ─── Extension Disabled State ────────────────────────────── */
@@ -1093,6 +1136,265 @@ select.form-input {
 
 .app.disabled .header-left {
   opacity: 0.5;
+}
+
+/* ─── Light Theme Override ────────────────────────────────── */
+.app.light-theme {
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(0, 0, 0, 0.035);
+  --bg-card-hover: rgba(0, 0, 0, 0.06);
+  --bg-glass: rgba(0, 0, 0, 0.04);
+  --border: rgba(0, 0, 0, 0.1);
+  --border-focus: rgba(99, 102, 241, 0.45);
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.06));
+}
+
+/* ── Blanket rule: force all text to black in light mode ── */
+.app.light-theme *:not(.btn-primary):not(.btn-primary *):not(.donate-btn):not(.donate-btn *) {
+  color: #111827;
+  -webkit-text-fill-color: #111827;
+}
+
+/* Restore muted/secondary text for specific labels */
+.app.light-theme .stat-label,
+.app.light-theme .meta-label,
+.app.light-theme .toggle-desc,
+.app.light-theme .dns-option-desc,
+.app.light-theme .account-user,
+.app.light-theme .header-subtitle,
+.app.light-theme .form-label,
+.app.light-theme .ql-name,
+.app.light-theme .gauge-unit {
+  color: #6b7280;
+  -webkit-text-fill-color: #6b7280;
+}
+
+/* Restore accent color for active tab */
+.app.light-theme .tab.active {
+  color: var(--accent-indigo);
+  -webkit-text-fill-color: var(--accent-indigo);
+}
+
+/* Keep primary button text white */
+.app.light-theme .btn-primary,
+.app.light-theme .btn-primary *,
+.app.light-theme .donate-btn,
+.app.light-theme .donate-btn * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Speed / health / gauge gradient values → indigo instead of invisible white */
+.app.light-theme .speed-value,
+.app.light-theme .health-rtt,
+.app.light-theme .gauge-value {
+  color: var(--accent-indigo) !important;
+  -webkit-text-fill-color: var(--accent-indigo) !important;
+}
+
+.app.light-theme {
+  background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom right, rgba(168, 85, 247, 0.05) 0%, transparent 60%),
+    var(--bg-primary);
+}
+
+/* Gradient clip text won't show on light bg — override with solid dark color */
+.app.light-theme .speed-value,
+.app.light-theme .health-rtt,
+.app.light-theme .gauge-value {
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: var(--accent-indigo);
+  background-clip: unset;
+  color: var(--accent-indigo);
+}
+
+/* Stat icons */
+.app.light-theme .stat-icon svg,
+.app.light-theme .card-icon svg {
+  color: var(--text-secondary);
+}
+
+/* Toggle slider knob */
+.app.light-theme .slider {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.app.light-theme .switch input:checked+.slider::before {
+  background: white;
+}
+
+/* Form inputs */
+.app.light-theme .form-input {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-primary);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.app.light-theme .form-input:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.app.light-theme select.form-input option {
+  background: #ffffff;
+  color: #111827;
+}
+
+/* Quick links */
+.app.light-theme .quicklink {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.app.light-theme .quicklink:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Tabs */
+.app.light-theme .tabs {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.app.light-theme .tab {
+  color: var(--text-secondary);
+}
+
+.app.light-theme .tab.active {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-indigo);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Header */
+.app.light-theme .header {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Cards */
+.app.light-theme .card {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.app.light-theme .card:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Account items */
+.app.light-theme .account-item {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.app.light-theme .account-item.active {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* DNS options */
+.app.light-theme .dns-option.active {
+  background: rgba(99, 102, 241, 0.07);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* VPN status dot */
+.app.light-theme .vpn-status-row {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* Progress bar */
+.app.light-theme .progress-bar {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Speed meta */
+.app.light-theme .meta-value {
+  color: var(--text-primary);
+}
+
+/* Toast */
+.app.light-theme .save-toast {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* Scrollbar */
+.app.light-theme .tab-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Footer */
+.app.light-theme .footer {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Settings note */
+.app.light-theme .settings-note {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.12);
+}
+
+/* Btn-secondary */
+.app.light-theme .btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-secondary);
+}
+
+.app.light-theme .btn-secondary:hover {
+  background: #ffffff;
+  color: var(--text-primary);
+}
+
+/* btn-icon */
+.app.light-theme .btn-icon {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+}
+
+/* Badge text in light mode */
+.app.light-theme .badge {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-secondary);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Health label */
+.app.light-theme .health-label,
+.app.light-theme .stat-label,
+.app.light-theme .meta-label,
+.app.light-theme .toggle-desc,
+.app.light-theme .dns-option-desc {
+  color: var(--text-muted);
+}
+
+
+
+/* ─── Clear Button ────────────────────────────────────────── */
+.btn-clear {
+  flex-shrink: 0;
+  width: auto;
+  padding: 9px 12px;
+  gap: 5px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.btn-clear:hover {
+  color: var(--accent-red);
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.07);
 }
 
 /* ─── Donate Card ─────────────────────────────────────────── */
@@ -1160,6 +1462,22 @@ select.form-input {
 
 .tab-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Dashboard Footer ────────────────────────────────────── */
+.dashboard-footer {
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+.dashboard-footer strong {
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 /* ─── Shake Animation ─────────────────────────────────────── */
