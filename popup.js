@@ -22,7 +22,10 @@
     const tabContents = $$('.tab-content');
 
     // Dashboard
-    const dataUsedValue = null; // removed
+    const dataUsedValue = $('#dataUsedValue');
+    const healthEmoji = $('#healthEmoji');
+    const healthRTT = $('#healthRTT');
+    const healthLabel = $('#healthLabel');
     const speedValue = $('#speedValue');
     const latencyValue = $('#latencyValue');
     const connectionType = $('#connectionType');
@@ -602,9 +605,12 @@
     loadStoredStatus();
     loadAccounts();
     checkNetwork();
+    updateDataUsage();
+    updateNetworkHealth();
 
     // Periodic updates
     setInterval(checkNetwork, 30000);
+    setInterval(updateDataUsage, 15000);
     setInterval(() => {
         chrome.storage.local.get(['sessionStart'], (data) => {
             if (data.sessionStart) updateSessionTime(data.sessionStart);
