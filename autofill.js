@@ -126,6 +126,24 @@
     // ════════════════════════════════════════════════════════════════
 
     function fillUMS(autoLogin) {
+        // Guard: only run on the UMS login page.
+        // After a successful login the user is on a dashboard/student page — we
+        // must NOT touch those pages or we'll cause an infinite reload loop.
+        const path = window.location.pathname.toLowerCase();
+        const href = window.location.href.toLowerCase();
+        const looksLikeLoginPage =
+            path === '/lpuums/' ||
+            path === '/lpuums/index.aspx' ||
+            href.includes('login') ||
+            href.includes('loginnew') ||
+            // BotDetect captcha is only on the login page (step 2)
+            !!document.querySelector('img.BDC_CaptchaImage, input[id*="CaptchaCode"]');
+
+        if (!looksLikeLoginPage) {
+            console.log('[LPU] UMS: not on login page — skipping auto-fill.');
+            return;
+        }
+
         chrome.storage.local.get(['umsUsername', 'umsPassword'], (data) => {
             const username = data.umsUsername || '';
             const password = data.umsPassword || '';
@@ -155,7 +173,7 @@
 
             // No password field → step 1 (username only)
             if (userField) {
-                // Prevent infinite reload: if username already matches, don't re-submit
+                // Prevent re-submit: if username already matches, don't re-submit
                 if (userField.value.trim() === username) {
                     console.log('[LPU] UMS username already filled, waiting for page to update...');
                     return;
