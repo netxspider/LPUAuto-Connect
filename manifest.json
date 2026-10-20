@@ -1,13 +1,12 @@
 {
     "manifest_version": 3,
     "name": "LPU Auto-Connect",
-    "version": "2.1.4",
-    "description": "Student productivity hub for LPU WiFi: auto-login, speed test, VPN proxy, keep-alive, quick links & multi-account.",
+    "version": "3.0.1",
+    "description": "Student productivity hub for LPU WiFi: auto-login, speed test, keep-alive, quick links & multi-account.",
     "permissions": [
         "storage",
         "activeTab",
         "tabs",
-        "proxy",
         "alarms",
         "webRequest"
     ],

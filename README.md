@@ -1,6 +1,6 @@
-# LPU Auto-Connect v2.0
+# LPU Auto-Connect v3.0.1
 
-A Chrome extension and student productivity hub for LPU WiFi — auto-login to the captive portal, one-click access to student portals with credential auto-fill, session keep-alive, data usage tracking, network health monitoring, and more.
+A Chrome extension and student productivity hub for LPU WiFi — auto-login to the captive portal, one-click access to student portals with credential auto-fill, session keep-alive, data usage tracking, network health monitoring, and more. Features an ultra-modern Apple glassmorphism interface.
 
 > **Support the project:** If this extension saved you time, consider [buying me a coffee](https://razorpay.me/@netxspider) ☕
 
@@ -30,7 +30,7 @@ Turn the entire extension ON or OFF using the toggle in the header. When disable
 | Feature | Description |
 |---------|-------------|
 | **Auto-Login** | Fills username, password, checks T&C, and submits on `internet.lpu.in` |
-| **Multi-Account** | Save and switch between multiple WiFi accounts |
+| **Multi-Account** | Save and switch between multiple WiFi accounts with prominent 1-click addition |
 | **Auto-Close Tab** | Closes the login tab after successful authentication |
 | **Session Keep-Alive** | Pings the portal every 15 minutes to prevent session timeout |
 | **Dark Mode (Portal)** | Injects a dark theme into the captive portal page |
@@ -38,6 +38,7 @@ Turn the entire extension ON or OFF using the toggle in the header. When disable
 ### 📊 Dashboard
 | Feature | Description |
 |---------|-------------|
+| **Apple Glassmorphism UI** | Fluid frosted glass design with dynamic ambient gradients |
 | **Data Usage Tracker** | Monitors daily network traffic via `chrome.webRequest` |
 | **Network Health Score** | RTT-based health rating (Gaming Ready / Low Latency / YouTube OK / Slow / WiFi Dying) |
 | **Speed Test** | One-click download speed and latency measurement |
@@ -63,12 +64,6 @@ One-click access to student portals — credentials are auto-filled on page load
 | **WiFi Accounts** | `internet.lpu.in` captive portal login |
 | **UMS / Portal Credentials** | UMS, MyClass, LPULive, OAS |
 | **NeoBrowser Credentials** | `examly.io` (defaults to `<regno>@neocolab.ai` / `<regno>`) |
-
-### 🛡️ VPN & DNS
-| Feature | Description |
-|---------|-------------|
-| **Proxy Toggle** | Route traffic through a custom HTTP/HTTPS/SOCKS proxy |
-| **Secure DNS** | Switch between Cloudflare, Google, Quad9, AdGuard, or system default DoH |
 
 ---
 
@@ -109,7 +104,7 @@ git clone https://github.com/netxspider/LPUInternetExtension.git
 
 #### 4. Verify Installation
 
-Click the extension icon — you should see the popup with three tabs: **Dashboard**, **VPN**, and **Settings**.
+Click the extension icon — you should see the popup with two tabs: **Dashboard** and **Settings**.
 
 ---
 
@@ -120,9 +115,9 @@ After installation, follow these steps to set up the extension:
 ### Step 1: Set Up WiFi Credentials
 
 1. Click the extension icon → go to the **Settings** tab
-2. Under **WiFi Accounts**, click the **+** button
+2. Click **"+ Add Another WiFi Account"** (or the **Add** button in the header)
 3. Enter:
-   - **Account Name** — any label (e.g. "Main", "Friend's")
+   - **Account Name** — any label (e.g. "Main", "Room", "Friend")
    - **Registration Number** — your LPU registration number
    - **Password** — your WiFi portal password
 4. Click **Save Account**
@@ -195,29 +190,9 @@ This is useful during **exams** or when you want to **manually control** your lo
 3. Wait for the test to complete (tests multiple chunk sizes)
 4. Results show download speed (Mbps) and latency (ms)
 
-### Setting Up VPN / Proxy
-
-1. Go to the **VPN** tab
-2. Enter your proxy details:
-   - **Proxy Host** (e.g. `proxy.example.com`)
-   - **Port** (e.g. `8080`)
-   - **Scheme** (HTTP, HTTPS, or SOCKS5)
-3. Click **Save Proxy Config**
-4. Toggle the proxy switch **ON**
-
-> `internet.lpu.in` is always bypassed so proxy doesn't break WiFi login.
-
-### Changing DNS
-
-1. Go to the **VPN** tab → **Secure DNS** section
-2. Select a DNS provider (Cloudflare, Google, Quad9, AdGuard)
-3. Click **Apply DNS**
-4. The DoH URL is copied to your clipboard — paste it in Chrome's DNS settings
-5. Click **"Open Chrome DNS Settings"** for quick access
-
 ### Supporting the Developer
 
-At the bottom of the **Settings** tab, there's a **"Buy Me a Coffee"** section. Click **"Donate via Razorpay"** to support the developer.
+At the bottom of the **Settings** tab, there's a **"Support Development"** section. Click **"Donate via Razorpay"** to buy the developer a coffee.
 
 ---
 
@@ -246,14 +221,13 @@ Tesseract.js reads captcha → fills it → you verify and login
 ```
 LPUInternetExtension/
 ├── manifest.json        → Extension config (MV3), permissions, content scripts
-├── background.js        → Service worker: keep-alive, data tracking, speed test, proxy
+├── background.js        → Service worker: keep-alive, data tracking, speed test
 ├── content.js           → Auto-login on internet.lpu.in + dark mode injection
 ├── autofill.js          → Auto-fill credentials on UMS, MyClass, LPULive, OAS, NeoBrowser
-├── tesseract.min.js     → Tesseract.js OCR library for UMS captcha solving
 ├── darkmode.css         → Dark theme stylesheet for captive portal
-├── popup.html           → Extension popup UI (3 tabs: Dashboard, VPN, Settings)
-├── popup.css            → Dark glassmorphism theme styles
-├── popup.js             → Popup logic: data usage, health, accounts, quick links
+├── popup.html           → Extension popup UI (2 tabs: Dashboard, Settings with Apple Glassmorphism)
+├── popup.css            → Apple glassmorphism and modern fluid stylesheet
+├── popup.js             → Popup logic: data usage, health, accounts, speed test, quick links
 ├── icons/
 │   ├── icon16.png
 │   ├── icon48.png
@@ -269,7 +243,6 @@ LPUInternetExtension/
 |------------|--------|
 | `storage` | Save credentials and settings locally |
 | `tabs` | Open quick links and manage login tabs |
-| `proxy` | VPN/proxy routing |
 | `alarms` | Schedule keep-alive pings every 15 minutes |
 | `webRequest` | Track network traffic for data usage estimation |
 | `<all_urls>` | Monitor data usage across all sites |
@@ -310,4 +283,4 @@ If this extension saved your time and effort, consider supporting the developer:
 
 ---
 
-**LPU Auto-Connect v2.0** — Made with ❤️ by [netxspider](https://github.com/netxspider)
+**LPU Auto-Connect v3.0.1** — Made with ❤️ by [netxspider](https://github.com/netxspider)

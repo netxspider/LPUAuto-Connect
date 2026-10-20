@@ -8,16 +8,21 @@
     <link rel="stylesheet" href="popup.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="app">
+        <!-- Ambient fluid glow orbs -->
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+
         <!-- Header -->
         <header class="header">
             <div class="header-left">
                 <div class="logo">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M1 9L3.54 11.11C5.67 8.17 8.62 6 12 6C15.38 6 18.33 8.17 20.46 11.11L23 9C20.32 5.36 16.42 3 12 3C7.58 3 3.68 5.36 1 9Z"
                             fill="url(#wifi-grad)" />
@@ -28,21 +33,27 @@
                             fill="url(#wifi-grad)" opacity="0.7" />
                         <defs>
                             <linearGradient id="wifi-grad" x1="1" y1="3" x2="23" y2="21" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#6366f1" />
-                                <stop offset="1" stop-color="#a855f7" />
+                                <stop stop-color="#818cf8" />
+                                <stop offset="0.5" stop-color="#a855f7" />
+                                <stop offset="1" stop-color="#ec4899" />
                             </linearGradient>
                         </defs>
                     </svg>
                 </div>
-                <div>
-                    <h1 class="header-title">LPU Auto-Connect</h1>
-                    <p class="header-subtitle" id="statusSubtitle">Checking network...</p>
+                <div class="header-meta">
+                    <div class="title-row">
+                        <h1 class="header-title">LPU Auto-Connect</h1>
+                        <span class="version-tag">v3.0.1</span>
+                    </div>
+                    <div class="status-container">
+                        <span class="live-beacon"></span>
+                        <p class="header-subtitle" id="statusSubtitle">Checking network...</p>
+                    </div>
                 </div>
             </div>
             <div class="header-controls">
-                <!-- Sun/Moon theme toggle -->
-                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme">
-                    <!-- Sun icon (shown in dark mode) -->
+                <!-- Theme toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Theme" type="button">
                     <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5" />
@@ -55,533 +66,559 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                     </svg>
-                    <!-- Moon icon (shown in light mode) -->
                     <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                     </svg>
                 </button>
-                <!-- Extension on/off toggle -->
-                <label class="switch" title="Enable / Disable Extension">
+                <!-- Master extension toggle -->
+                <label class="apple-switch" title="Enable / Disable Extension">
                     <input type="checkbox" id="extensionToggle" checked>
-                    <span class="slider"></span>
+                    <span class="apple-switch-slider"></span>
                 </label>
             </div>
         </header>
 
-        <!-- Tab Navigation -->
-        <nav class="tabs">
-            <button class="tab active" data-tab="dashboard">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7" rx="1" />
-                    <rect x="14" y="3" width="7" height="7" rx="1" />
-                    <rect x="3" y="14" width="7" height="7" rx="1" />
-                    <rect x="14" y="14" width="7" height="7" rx="1" />
-                </svg>
-                Dashboard
-            </button>
-            <button class="tab" data-tab="dns">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-                VPN
-            </button>
-            <button class="tab" data-tab="settings">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3" />
-                    <path
-                        d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                </svg>
-                Settings
-            </button>
+        <!-- Apple Glassmorphism Tab Navigation -->
+        <nav class="tabs-container">
+            <div class="tabs" role="tablist">
+                <button class="tab active" data-tab="dashboard" role="tab" aria-selected="true" type="button">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="tab" data-tab="settings" role="tab" aria-selected="false" type="button">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    <span>Settings</span>
+                </button>
+            </div>
         </nav>
 
-        <!-- Dashboard Tab -->
-        <div class="tab-content active" id="tab-dashboard">
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Dashboard Tab (Modern Fluid Glassmorphism)                      -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <main class="tab-content active" id="tab-dashboard" role="tabpanel">
 
-            <!-- Data Usage + Network Health Row -->
-            <div class="stats-row stats-row-2">
-                <div class="card stat-card">
-                    <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                            <rect x="3" y="12" width="4" height="9" rx="1" />
-                            <rect x="10" y="7" width="4" height="14" rx="1" />
-                            <rect x="17" y="3" width="4" height="18" rx="1" />
-                        </svg></span>
-                    <span class="stat-value" id="dataUsedValue">0 MB</span>
-                    <span class="stat-label">Today's Usage</span>
+            <!-- Row 1: Usage + Health Cards -->
+            <div class="stats-grid-2">
+                <!-- Data Usage Card -->
+                <div class="glass-card stat-tile">
+                    <div class="stat-tile-top">
+                        <div class="stat-badge-icon purple">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                <polyline points="12 6 12 12 14 14"></polyline>
+                            </svg>
+                        </div>
+                        <span class="stat-tile-label">Today's Data</span>
+                    </div>
+                    <div class="stat-tile-body">
+                        <span class="stat-tile-value" id="dataUsedValue">0 MB</span>
+                    </div>
                 </div>
-                <div class="card stat-card" id="healthStatCard">
-                    <span class="stat-icon" id="healthEmoji"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
-                            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
-                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-                            <circle cx="12" cy="20" r="1" fill="currentColor" />
-                        </svg></span>
-                    <span class="stat-value" id="healthRTT">&mdash; ms</span>
-                    <span class="stat-label" id="healthLabel">Checking...</span>
+
+                <!-- Network Health Card -->
+                <div class="glass-card stat-tile" id="healthStatCard">
+                    <div class="stat-tile-top">
+                        <div class="stat-badge-icon emerald" id="healthEmoji">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                                <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                                <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                                <circle cx="12" cy="20" r="1" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <span class="stat-tile-label" id="healthLabel">Checking...</span>
+                    </div>
+                    <div class="stat-tile-body">
+                        <span class="stat-tile-value tabular" id="healthRTT">&mdash; ms</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Speed Test Card -->
-            <div class="card speed-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Speed Test Hero Card -->
+            <div class="glass-card speed-hero-card">
+                <div class="card-glass-header">
+                    <div class="header-icon-pill">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                        </svg></span>
-                    <span class="card-title">Speed Test</span>
-                </div>
-                <div class="speed-display">
-                    <div class="speed-value-container">
-                        <span class="speed-value" id="speedValue">&mdash;</span>
-                        <span class="speed-unit">Mbps</span>
+                        </svg>
                     </div>
-                    <div class="speed-meta">
-                        <div class="speed-meta-item">
-                            <span class="meta-label">Latency</span>
-                            <span class="meta-value" id="latencyValue">&mdash;</span>
+                    <span class="card-glass-title">Network Speed Test</span>
+                </div>
+
+                <!-- Speed Dial Readout -->
+                <div class="speed-center-stage">
+                    <div class="speed-aurora-glow"></div>
+                    <div class="speed-digits-container">
+                        <span class="speed-number tabular" id="speedValue">&mdash;</span>
+                        <span class="speed-unit-tag">Mbps</span>
+                    </div>
+
+                    <!-- Micro Metrics Chips -->
+                    <div class="speed-chips-row">
+                        <div class="speed-chip">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span class="chip-label">Latency:</span>
+                            <span class="chip-val tabular" id="latencyValue">&mdash;</span>
                         </div>
-                        <div class="speed-meta-item">
-                            <span class="meta-label">Type</span>
-                            <span class="meta-value" id="connectionType">&mdash;</span>
+                        <div class="speed-chip">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                                <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                                <circle cx="12" cy="20" r="1" fill="currentColor" />
+                            </svg>
+                            <span class="chip-label">Type:</span>
+                            <span class="chip-val" id="connectionType">&mdash;</span>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary speed-btn" id="runSpeedTest">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                <!-- Speed CTA & Progress -->
+                <button class="fluid-btn speed-action-btn" id="runSpeedTest" type="button">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <polygon points="5 3 19 12 5 21 5 3" />
                     </svg>
-                    Run Speed Test
+                    <span>Run Speed Test</span>
                 </button>
-                <div class="progress-bar" id="speedProgress">
-                    <div class="progress-fill"></div>
+                <div class="fluid-progress-bar" id="speedProgress">
+                    <div class="fluid-progress-fill"></div>
                 </div>
             </div>
 
-            <!-- Quick Links -->
-            <div class="card quicklinks-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <!-- Quick Links (Bento Grid) -->
+            <div class="glass-card quicklinks-section">
+                <div class="card-glass-header">
+                    <div class="header-icon-pill">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round">
                             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                        </svg></span>
-                    <span class="card-title">Quick Links</span>
+                        </svg>
+                    </div>
+                    <span class="card-glass-title">Student Portals</span>
+                    <span class="badge-auto-tag">Auto-Fill</span>
                 </div>
-                <div class="quicklinks-grid">
-                    <button class="quicklink" data-url="https://ums.lpu.in/lpuums/" data-name="UMS">
-                        <span class="ql-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="quicklinks-bento">
+                    <button class="quicklink bento-tile" data-url="https://ums.lpu.in/lpuums/" data-name="UMS" type="button">
+                        <div class="tile-icon-wrap ums">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                                 <path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5" />
-                            </svg></span>
-                        <span class="ql-name">UMS</span>
+                            </svg>
+                        </div>
+                        <span class="tile-title">UMS</span>
                     </button>
-                    <button class="quicklink" data-url="https://myclass.lpu.in/" data-name="MyClass">
-                        <span class="ql-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="quicklink bento-tile" data-url="https://myclass.lpu.in/" data-name="MyClass" type="button">
+                        <div class="tile-icon-wrap myclass">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                            </svg></span>
-                        <span class="ql-name">MyClass</span>
+                            </svg>
+                        </div>
+                        <span class="tile-title">MyClass</span>
                     </button>
-                    <button class="quicklink" data-url="https://lpulive.lpu.in/" data-name="LPULive">
-                        <span class="ql-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="quicklink bento-tile" data-url="https://lpulive.lpu.in/" data-name="LPULive" type="button">
+                        <div class="tile-icon-wrap lpulive">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
                                 <polyline points="17 2 12 7 7 2" />
-                            </svg></span>
-                        <span class="ql-name">LPULive</span>
+                            </svg>
+                        </div>
+                        <span class="tile-title">LPULive</span>
                     </button>
-                    <button class="quicklink" data-url="https://oas.lpu.in/" data-name="OAS">
-                        <span class="ql-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="quicklink bento-tile" data-url="https://oas.lpu.in/" data-name="OAS" type="button">
+                        <div class="tile-icon-wrap oas">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg></span>
-                        <span class="ql-name">OAS</span>
+                            </svg>
+                        </div>
+                        <span class="tile-title">OAS</span>
                     </button>
-                    <button class="quicklink" data-url="https://lpucolab438.examly.io/" data-name="NeoBrowser">
-                        <span class="ql-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="quicklink bento-tile" data-url="https://lpucolab438.examly.io/" data-name="NeoBrowser" type="button">
+                        <div class="tile-icon-wrap neo">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
                                 <line x1="8" y1="21" x2="16" y2="21" />
                                 <line x1="12" y1="17" x2="12" y2="21" />
-                            </svg></span>
-                        <span class="ql-name">Neo</span>
+                            </svg>
+                        </div>
+                        <span class="tile-title">NeoColab</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Stats Row -->
-            <div class="stats-row">
-                <div class="card stat-card">
-                    <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <!-- Stats Row 2 (Metrics Trio) -->
+            <div class="stats-trio">
+                <div class="glass-card micro-metric">
+                    <span class="metric-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10" />
                             <polyline points="12 6 12 12 16 14" />
-                        </svg></span>
-                    <span class="stat-value" id="sessionTime">0m</span>
-                    <span class="stat-label">Session</span>
+                        </svg>
+                    </span>
+                    <span class="metric-val tabular" id="sessionTime">0m</span>
+                    <span class="metric-name">Session</span>
                 </div>
-                <div class="card stat-card">
-                    <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <div class="glass-card micro-metric">
+                    <span class="metric-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="23 4 23 10 17 10" />
                             <polyline points="1 20 1 14 7 14" />
                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10" />
                             <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14" />
-                        </svg></span>
-                    <span class="stat-value" id="loginCount">0</span>
-                    <span class="stat-label">Logins</span>
+                        </svg>
+                    </span>
+                    <span class="metric-val tabular" id="loginCount">0</span>
+                    <span class="metric-name">Logins</span>
                 </div>
-                <div class="card stat-card">
-                    <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <div class="glass-card micro-metric">
+                    <span class="metric-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 20h.01" />
                             <path d="M2 8.82a15 15 0 0 1 20 0" />
                             <path d="M5 12.86a10 10 0 0 1 14 0" />
                             <path d="M8.5 16.9a5 5 0 0 1 7 0" />
-                        </svg></span>
-                    <span class="stat-value" id="downlinkValue">&mdash;</span>
-                    <span class="stat-label">Downlink</span>
+                        </svg>
+                    </span>
+                    <span class="metric-val tabular" id="downlinkValue">&mdash;</span>
+                    <span class="metric-name">Downlink</span>
                 </div>
             </div>
 
-        </div>
+        </main>
 
-        <!-- VPN/DNS Tab -->
-        <div class="tab-content" id="tab-dns">
-            <!-- VPN Proxy Card -->
-            <div class="card vpn-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg></span>
-                    <span class="card-title">VPN Proxy</span>
-                </div>
-                <p class="dns-description">
-                    Route traffic through a proxy to bypass blocked sites. internet.lpu.in is always bypassed.
-                </p>
-                <div class="vpn-status-row">
-                    <div class="vpn-status">
-                        <div class="vpn-dot" id="vpnDot"></div>
-                        <span class="vpn-label" id="vpnLabel">Proxy Off</span>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Settings Tab (Clean, Decluttered, Intuitive UI/UX)              -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <main class="tab-content" id="tab-settings" role="tabpanel">
+
+            <!-- Section 1: WiFi Accounts (Captive Portal) -->
+            <div class="settings-group">
+                <div class="settings-group-header">
+                    <div class="group-header-text">
+                        <span class="group-title">WiFi Accounts</span>
+                        <span class="group-subtitle">Captive portal credentials for internet.lpu.in</span>
                     </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleVPN">
-                        <span class="slider"></span>
-                    </label>
+                    <span class="portal-status-badge not-set" id="wifiStatusBadge">Not Set</span>
                 </div>
-                <div class="vpn-config" id="vpnConfig">
-                    <div class="form-group">
-                        <label class="form-label" for="proxyHost">Proxy Host</label>
-                        <input type="text" class="form-input" id="proxyHost" placeholder="e.g. proxy.example.com">
-                    </div>
-                    <div class="vpn-row">
-                        <div class="form-group" style="flex:1">
-                            <label class="form-label" for="proxyPort">Port</label>
-                            <input type="number" class="form-input" id="proxyPort" placeholder="8080">
+
+                <div class="glass-card accounts-container">
+                    <!-- Populated Accounts List -->
+                    <div class="accounts-list" id="accountsList"></div>
+
+                    <!-- Prominent "Add Account" Button: Easy to find for all users -->
+                    <button class="btn-add-account-prominent" id="addAccountBannerBtn" type="button">
+                        <div class="plus-icon-bubble">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
                         </div>
-                        <div class="form-group" style="flex:1">
-                            <label class="form-label" for="proxyScheme">Scheme</label>
-                            <select class="form-input" id="proxyScheme">
-                                <option value="http">HTTP</option>
-                                <option value="https">HTTPS</option>
-                                <option value="socks5">SOCKS5</option>
-                            </select>
+                        <div class="add-account-text">
+                            <span class="add-account-main">Add Account</span>
+                            <span class="add-account-sub">Save credentials for automatic captive portal login</span>
+                        </div>
+                    </button>
+
+                    <!-- Add Account Form Drawer (hidden by default) -->
+                    <div class="glass-form-drawer" id="addAccountForm" style="display:none">
+                        <div class="form-drawer-header">
+                            <div class="drawer-title-box">
+                                <span class="drawer-title">New WiFi Account</span>
+                                <span class="drawer-badge">internet.lpu.in</span>
+                            </div>
+                        </div>
+
+                        <div class="field-stack">
+                            <div class="form-field">
+                                <label class="field-label" for="newAccountName">Account Nickname</label>
+                                <div class="input-glass-wrap">
+                                    <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <input type="text" class="glass-input" id="newAccountName" placeholder="e.g. Main, Hostel, Friend">
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label class="field-label" for="newAccountUser">Registration Number</label>
+                                <div class="input-glass-wrap">
+                                    <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                        <line x1="7" y1="8" x2="17" y2="8"></line>
+                                        <line x1="7" y1="12" x2="17" y2="12"></line>
+                                        <line x1="7" y1="16" x2="12" y2="16"></line>
+                                    </svg>
+                                    <input type="text" class="glass-input" id="newAccountUser" placeholder="12345678" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label class="field-label" for="newAccountPass">Password</label>
+                                <div class="input-glass-wrap">
+                                    <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    <input type="password" class="glass-input" id="newAccountPass" placeholder="WiFi Portal Password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions-row">
+                            <button class="fluid-btn btn-primary" id="saveNewAccount" type="button">Save Account</button>
+                            <button class="fluid-btn btn-secondary" id="cancelNewAccount" type="button">Cancel</button>
                         </div>
                     </div>
-                    <button class="btn btn-primary vpn-save-btn" id="saveProxy">Save Proxy Config</button>
                 </div>
             </div>
 
-            <!-- DNS Section -->
-            <div class="card dns-providers-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg></span>
-                    <span class="card-title">Secure DNS</span>
-                    <span class="dns-current-value" id="currentDNS" style="margin-left:auto;font-size:11px">System
-                        Default</span>
-                </div>
-                <div class="dns-option active" data-dns="default">
-                    <div class="dns-radio">
-                        <div class="dns-radio-inner"></div>
-                    </div>
-                    <div class="dns-option-info">
-                        <span class="dns-option-name">System Default</span>
+            <!-- Section 2: Student Portal Credentials -->
+            <div class="settings-group">
+                <div class="settings-group-header">
+                    <div class="group-header-text">
+                        <span class="group-title">Portal Auto-Fill</span>
+                        <span class="group-subtitle">Saved login credentials for university portals</span>
                     </div>
                 </div>
-                <div class="dns-option" data-dns="cloudflare">
-                    <div class="dns-radio">
-                        <div class="dns-radio-inner"></div>
-                    </div>
-                    <div class="dns-option-info">
-                        <span class="dns-option-name">Cloudflare</span>
-                        <span class="dns-option-desc">1.1.1.1</span>
-                    </div>
-                    <span class="dns-badge fast">Fast</span>
-                </div>
-                <div class="dns-option" data-dns="google">
-                    <div class="dns-radio">
-                        <div class="dns-radio-inner"></div>
-                    </div>
-                    <div class="dns-option-info">
-                        <span class="dns-option-name">Google DNS</span>
-                        <span class="dns-option-desc">8.8.8.8</span>
-                    </div>
-                </div>
-                <div class="dns-option" data-dns="quad9">
-                    <div class="dns-radio">
-                        <div class="dns-radio-inner"></div>
-                    </div>
-                    <div class="dns-option-info">
-                        <span class="dns-option-name">Quad9</span>
-                        <span class="dns-option-desc">9.9.9.9</span>
-                    </div>
-                    <span class="dns-badge secure">Secure</span>
-                </div>
-                <div class="dns-option" data-dns="adguard">
-                    <div class="dns-radio">
-                        <div class="dns-radio-inner"></div>
-                    </div>
-                    <div class="dns-option-info">
-                        <span class="dns-option-name">AdGuard</span>
-                        <span class="dns-option-desc">94.140.14.14</span>
-                    </div>
-                    <span class="dns-badge adblock">Ads</span>
-                </div>
-                <button class="btn btn-primary dns-apply-btn" id="applyDNS" style="margin-top:10px">Apply DNS</button>
-            </div>
 
-            <button class="btn btn-secondary" id="openChromeSecureDNS" style="margin-bottom:10px">
-                Open Chrome DNS Settings ↗
-            </button>
+                <div class="glass-card portals-grouped-card">
+                    <!-- Subsection: UMS & Main Portals -->
+                    <div class="portal-subcard">
+                        <div class="subcard-header">
+                            <div class="subcard-title-wrap">
+                                <div class="stat-badge-icon purple small">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                        <path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5" />
+                                    </svg>
+                                </div>
+                                <span class="subcard-title">UMS & Academic Portals</span>
+                            </div>
+                            <span class="portal-status-badge not-set" id="umsStatusBadge">Not Set</span>
+                        </div>
 
-            <div class="save-toast" id="dnsToast">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span id="dnsToastMsg">Done!</span>
-            </div>
-        </div>
+                        <div class="field-stack">
+                            <div class="form-field">
+                                <label class="field-label" for="umsUsername">Registration Number</label>
+                                <div class="input-glass-wrap">
+                                    <input type="text" class="glass-input" id="umsUsername" placeholder="12345678" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label class="field-label" for="umsPassword">Password</label>
+                                <div class="input-glass-wrap">
+                                    <input type="password" class="glass-input" id="umsPassword" placeholder="Portal password">
+                                </div>
+                            </div>
+                        </div>
 
-        <!-- Settings Tab -->
-        <div class="tab-content" id="tab-settings">
-            <!-- WiFi Accounts (for internet.lpu.in) -->
-            <div class="card settings-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
-                            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
-                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-                            <circle cx="12" cy="20" r="1" fill="currentColor" />
-                        </svg></span>
-                    <span class="card-title">WiFi Accounts</span>
-                    <button class="btn-icon" id="addAccountBtn" title="Add Account">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="accounts-list" id="accountsList">
-                    <!-- Populated by JS -->
-                </div>
-                <!-- Add Account Form (hidden by default) -->
-                <div class="add-account-form" id="addAccountForm" style="display:none">
-                    <div class="form-group">
-                        <label class="form-label">Account Name</label>
-                        <input type="text" class="form-input" id="newAccountName" placeholder="e.g. Main, Friend">
+                        <div class="form-actions-row">
+                            <button class="fluid-btn btn-primary-glass" id="saveUmsCredentials" type="button">Save UMS</button>
+                            <button class="fluid-btn btn-danger-ghost" id="clearUmsCredentials" title="Clear saved credentials" type="button">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                                <span>Clear</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Registration Number</label>
-                        <input type="text" class="form-input" id="newAccountUser" placeholder="12345678">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="newAccountPass" placeholder="Password">
-                    </div>
-                    <div class="btn-row">
-                        <button class="btn btn-primary" id="saveNewAccount" style="flex:1">Save Account</button>
-                        <button class="btn btn-secondary" id="cancelNewAccount" style="flex:1">Cancel</button>
+
+                    <div class="group-divider"></div>
+
+                    <!-- Subsection: NeoColab / Examly -->
+                    <div class="portal-subcard">
+                        <div class="subcard-header">
+                            <div class="subcard-title-wrap">
+                                <div class="stat-badge-icon cyan small">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                        <line x1="8" y1="21" x2="16" y2="21" />
+                                        <line x1="12" y1="17" x2="12" y2="21" />
+                                    </svg>
+                                </div>
+                                <span class="subcard-title">NeoBrowser / Examly</span>
+                            </div>
+                            <span class="portal-status-badge not-set" id="neoStatusBadge">Not Set</span>
+                        </div>
+
+                        <div class="field-stack">
+                            <div class="form-field">
+                                <label class="field-label" for="neoUsername">Email / Username</label>
+                                <div class="input-glass-wrap">
+                                    <input type="text" class="glass-input" id="neoUsername" placeholder="12345678@neocolab.ai">
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label class="field-label" for="neoPassword">Password</label>
+                                <div class="input-glass-wrap">
+                                    <input type="password" class="glass-input" id="neoPassword" placeholder="Examly password (usually Reg No)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions-row">
+                            <button class="fluid-btn btn-primary-glass" id="saveNeoCredentials" type="button">Save Neo</button>
+                            <button class="fluid-btn btn-danger-ghost" id="clearNeoCredentials" title="Clear saved credentials" type="button">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                                <span>Clear</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- UMS / Portal Credentials (separate from WiFi) -->
-            <div class="card settings-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                            <path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5" />
-                        </svg></span>
-                    <span class="card-title">UMS / Portal Credentials</span>
+
+            <!-- Section 3: Preferences & Automation -->
+            <div class="settings-group">
+                <div class="settings-group-header">
+                    <div class="group-header-text">
+                        <span class="group-title">Preferences</span>
+                        <span class="group-subtitle">Smart connection and portal behaviors</span>
+                    </div>
                 </div>
-                <p class="settings-note">Used for UMS, MyClass, LPULive, OAS</p>
-                <div class="form-group">
-                    <label class="form-label" for="umsUsername">Registration Number</label>
-                    <input type="text" class="form-input" id="umsUsername" placeholder="12345678">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="umsPassword">Password</label>
-                    <input type="password" class="form-input" id="umsPassword" placeholder="Portal password">
-                </div>
-                <div class="btn-row" style="margin-top:4px">
-                    <button class="btn btn-primary" id="saveUmsCredentials" style="flex:1">Save Portal
-                        Credentials</button>
-                    <button class="btn btn-secondary btn-clear" id="clearUmsCredentials"
-                        title="Clear saved credentials">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14H6L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4h6v2" />
-                        </svg>
-                        Clear
-                    </button>
+
+                <div class="glass-card ios-grouped-list">
+                    <!-- Toggle 1: Auto-Login -->
+                    <div class="ios-item">
+                        <div class="ios-item-icon blue">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="ios-item-text">
+                            <span class="ios-title">Auto-Login</span>
+                            <span class="ios-desc">Auto-submits login on captive portal</span>
+                        </div>
+                        <label class="apple-switch">
+                            <input type="checkbox" id="toggleAutoLogin" checked>
+                            <span class="apple-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Toggle 2: Auto-Close -->
+                    <div class="ios-item">
+                        <div class="ios-item-icon green">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="ios-item-text">
+                            <span class="ios-title">Auto-Close Tab</span>
+                            <span class="ios-desc">Closes login tab after success</span>
+                        </div>
+                        <label class="apple-switch">
+                            <input type="checkbox" id="toggleAutoClose" checked>
+                            <span class="apple-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Toggle 3: Keep-Alive -->
+                    <div class="ios-item">
+                        <div class="ios-item-icon purple">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                            </svg>
+                        </div>
+                        <div class="ios-item-text">
+                            <span class="ios-title">Session Keep-Alive</span>
+                            <span class="ios-desc">Pings every 15 min to prevent timeout</span>
+                        </div>
+                        <label class="apple-switch">
+                            <input type="checkbox" id="toggleKeepAlive" checked>
+                            <span class="apple-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Toggle 4: Portal Dark Mode -->
+                    <div class="ios-item">
+                        <div class="ios-item-icon amber">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </div>
+                        <div class="ios-item-text">
+                            <span class="ios-title">Portal Dark Mode</span>
+                            <span class="ios-desc">Applies sleek theme to internet.lpu.in</span>
+                        </div>
+                        <label class="apple-switch">
+                            <input type="checkbox" id="toggleDarkMode">
+                            <span class="apple-switch-slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <!-- NeoBrowser Credentials -->
-            <div class="card settings-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                            <line x1="8" y1="21" x2="16" y2="21" />
-                            <line x1="12" y1="17" x2="12" y2="21" />
-                        </svg></span>
-                    <span class="card-title">NeoBrowser Credentials</span>
-                </div>
-                <p class="settings-note">Default: your_regno@neocolab.ai / your_regno</p>
-                <div class="form-group">
-                    <label class="form-label" for="neoUsername">Username</label>
-                    <input type="text" class="form-input" id="neoUsername" placeholder="12345678@neocolab.ai">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="neoPassword">Password</label>
-                    <input type="password" class="form-input" id="neoPassword" placeholder="Registration number">
-                </div>
-                <div class="btn-row" style="margin-top:4px">
-                    <button class="btn btn-primary" id="saveNeoCredentials" style="flex:1">Save Neo Credentials</button>
-                    <button class="btn btn-secondary btn-clear" id="clearNeoCredentials"
-                        title="Clear saved credentials">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14H6L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4h6v2" />
-                        </svg>
-                        Clear
-                    </button>
-                </div>
-            </div>
-
-            <!-- Preferences -->
-            <div class="card settings-card">
-                <div class="card-header">
-                    <span class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3" />
-                            <path
-                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                        </svg></span>
-                    <span class="card-title">Preferences</span>
-                </div>
-                <div class="toggle-row">
-                    <div>
-                        <span class="toggle-label">Auto-Login</span>
-                        <span class="toggle-desc">Automatically submit login form</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleAutoLogin" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-row">
-                    <div>
-                        <span class="toggle-label">Auto-Close Tab</span>
-                        <span class="toggle-desc">Close login tab after success</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleAutoClose" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-row">
-                    <div>
-                        <span class="toggle-label">Session Keep-Alive</span>
-                        <span class="toggle-desc">Ping portal every 15min to prevent timeout</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleKeepAlive" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-row">
-                    <div>
-                        <span class="toggle-label">Dark Mode (Portal)</span>
-                        <span class="toggle-desc">Make internet.lpu.in dark themed</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleDarkMode">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-            </div>
-
-            <!-- Buy Me a Coffee -->
-            <div class="card donate-card">
-                <div class="card-header">
-                    <span class="card-icon donate-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Section 4: Buy Me a Coffee Support -->
+            <div class="glass-card donate-card">
+                <div class="donate-inner">
+                    <div class="donate-icon-bubble">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
                             <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
                             <line x1="6" y1="1" x2="6" y2="4" />
                             <line x1="10" y1="1" x2="10" y2="4" />
                             <line x1="14" y1="1" x2="14" y2="4" />
                         </svg>
-                    </span>
-                    <span class="card-title">Buy Me a Coffee</span>
+                    </div>
+                    <div class="donate-body">
+                        <span class="donate-title">Support Development</span>
+                        <p class="donate-desc">Saved you time this semester? Consider buying the developer a coffee!</p>
+                        <button class="fluid-btn donate-btn" id="donateBtn" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
+                            <span>Donate via Razorpay</span>
+                        </button>
+                    </div>
                 </div>
-                <p class="donate-text">If this extension saved you time, consider supporting the developer!</p>
-                <button class="btn donate-btn" id="donateBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path
-                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                    Donate via Razorpay
-                </button>
             </div>
 
+            <!-- Toast feedback -->
             <div class="save-toast" id="saveToast">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span id="saveToastMsg">Saved!</span>
+                <div class="toast-indicator">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+                <span id="saveToastMsg">Saved successfully!</span>
             </div>
-        </div>
+        </main>
 
         <!-- Footer -->
         <footer class="footer">
-            <span>LPU Auto-Connect v2.1.4</span>
-            <span>•</span>
-            <span>Made by netxspider</span>
+            <span class="footer-badge">LPU Auto-Connect v3.0.1</span>
+            <span class="footer-dot">•</span>
+            <span>Crafted for LPU</span>
         </footer>
     </div>
 
